@@ -3,7 +3,9 @@
 
 		.org 0xC000
 
-		.incbin "font.bin"
+splash:
+		.incbin "splash.mo7"
+splash_end:
 
 ;************** VIDEO ULA CONTROL REGISTER SETTINGS ***********************
 
@@ -136,36 +138,27 @@ crlp1:		stab	CRTC_A
 
 
 		ldx	#0x7C00
-		ldaa	#32
-clslp:		staa	0,X
-		inx
-		cpx	#0x8000
-		bne	clslp
-
-		ldx	#0x7C00
+		stx 	2
+		ldx	#splash
 		stx	0
-		ldx	#msg
-		stx	2
-prlp:		ldx	2
-		ldaa	0,X
-		beq	done
+.1:		ldaa	0,X
+		ldx	2
+		staa	0,X
 		inx
 		stx	2
 		ldx	0
-		staa	0,X
 		inx
 		stx	0
-		jmp	prlp
-done:
+		cpx	#splash_end
+		bne	.1
 
 here:		jmp	here
 
-msg:		.byte "Hello Stardot - 6800 first light",0
 
 
 
 
-		.org 0x3FF8
+		.org 0xFFF8
 hw_irq:		.word	handle_res
 hw_swi:		.word	handle_res
 hw_nmi:		.word	handle_res
