@@ -1,644 +1,640 @@
 ; Dominic Beesley December 1 Jan 2022
 		
-		.area ZEROPAGE (ABS,PAG)
-		.setdp
 
-CC_N			= 0x8
-CC_Z			= 0x4
-CC_V			= 0x2
-CC_C			= 0x1
+	.equ	CC_N,			0x8
+	.equ	CC_Z,			0x4
+	.equ	CC_V,			0x2
+	.equ	CC_C,			0x1
 
 		; user variables
-		.org	0x00
-zp_ptr1:	.ds	2
-zp_ptr2:	.ds	2
-zp_ptr3:	.ds	2
+		.section ZERO, "aurwz"
+zp_ptr1:	.space	2
+zp_ptr2:	.space	2
+zp_ptr3:	.space	2
 
 		; mos variables
-CRFS_LOAD		= 0xb0
-CRFS_LOAD_HI		= 0xb1
-CRFS_LOAD_VHI		= 0xb2
-CRFS_LOAD_XHI		= 0xb3
-CRFS_EXEC		= 0xb4
-CRFS_EXEC_HI		= 0xb5
-CRFS_NEXT_BLK		= 0xb6
-CRFS_NEXT_BLK_HI	= 0xb7
-CRFS_ERR_PTR		= 0xb8
-CRFS_ERR_PTR_HI		= 0xb9
-CRFS_BLOCK_FLAG		= 0xba
-CRFS_OPTS		= 0xbb
-CRFS_BLK_OFFSET		= 0xbc
-CRFS_BLK_LAST		= 0xbd
-CRFS_CRC_TMP		= 0xbe
-CRFS_CRC_TMP_HI		= 0xbf
+	.equ	CRFS_LOAD,		0xb0
+	.equ	CRFS_LOAD_HI,		0xb1
+	.equ	CRFS_LOAD_VHI,		0xb2
+	.equ	CRFS_LOAD_XHI,		0xb3
+	.equ	CRFS_EXEC,		0xb4
+	.equ	CRFS_EXEC_HI,		0xb5
+	.equ	CRFS_NEXT_BLK,		0xb6
+	.equ	CRFS_NEXT_BLK_HI,	0xb7
+	.equ	CRFS_ERR_PTR,		0xb8
+	.equ	CRFS_ERR_PTR_HI,	0xb9
+	.equ	CRFS_BLOCK_FLAG,	0xba
+	.equ	CRFS_OPTS,		0xbb
+	.equ	CRFS_BLK_OFFSET,	0xbc
+	.equ	CRFS_BLK_LAST,		0xbd
+	.equ	CRFS_CRC_TMP,		0xbe
+	.equ	CRFS_CRC_TMP_HI,	0xbf
 
-CRFS_BUFFER_FLAG	= 0xc0
-CRFS_CRC_RESULT		= 0xc1
-CRFS_PROGRESS		= 0xc2
-CFS_HANDLE		= 0xc3
-CRFS_TMP		= 0xc4
-CFS_BAUD_RATE		= 0xc6
-CFS_INTERBLOCK		= 0xc7
-CRFS_OSFILE_PTR		= 0xc8
-CRFS_OSFILE_PTR_HI	= 0xc9
-CFS_SERIAL_CTRL		= 0xca
-CRFS_CRC_BIT_CNT	= 0xcb
-CRFS_FILE_SIZE		= 0xcc
-CRFS_FILE_SIZE_HI	= 0xcd
+	.equ	CRFS_BUFFER_FLAG,	0xc0
+	.equ	CRFS_CRC_RESULT,	0xc1
+	.equ	CRFS_PROGRESS,		0xc2
+	.equ	CFS_HANDLE,		0xc3
+	.equ	CRFS_TMP,		0xc4
+	.equ	CFS_BAUD_RATE,		0xc6
+	.equ	CFS_INTERBLOCK,		0xc7
+	.equ	CRFS_OSFILE_PTR,	0xc8
+	.equ	CRFS_OSFILE_PTR_HI,	0xc9
+	.equ	CFS_SERIAL_CTRL,	0xca
+	.equ	CRFS_CRC_BIT_CNT,	0xcb
+	.equ	CRFS_FILE_SIZE,		0xcc
+	.equ	CRFS_FILE_SIZE_HI,	0xcd
 
-VDU_STATUS		= 0xd0
-VDU_G_PIX_MASK		= 0xd1
-VDU_T_OR_MASK		= 0xd2
-VDU_T_EOR_MASK		= 0xd3
-VDU_G_OR_MASK		= 0xd4
-VDU_G_EOR_MASK		= 0xd5
+	.equ	VDU_STATUS,		0xd0
+	.equ	VDU_G_PIX_MASK,		0xd1
+	.equ	VDU_T_OR_MASK,		0xd2
+	.equ	VDU_T_EOR_MASK,		0xd3
+	.equ	VDU_G_OR_MASK,		0xd4
+	.equ	VDU_G_EOR_MASK,		0xd5
 ; endianness
-VDU_G_MEM_HI		= 0xd6
-VDU_G_MEM		= 0xd7
+	.equ	VDU_G_MEM_HI,		0xd6
+	.equ	VDU_G_MEM,		0xd7
 ; endianness
-VDU_TOP_SCAN_HI		= 0xd8
-VDU_TOP_SCAN		= 0xd9
-VDU_TMP1		= 0xda
-VDU_TMP2		= 0xdb
-VDU_TMP3		= 0xdc
-VDU_TMP4		= 0xdd
-VDU_TMP5		= 0xde
-VDU_TMP6		= 0xdf
+	.equ	VDU_TOP_SCAN_HI,	0xd8
+	.equ	VDU_TOP_SCAN,		0xd9
+	.equ	VDU_TMP1,		0xda
+	.equ	VDU_TMP2,		0xdb
+	.equ	VDU_TMP3,		0xdc
+	.equ	VDU_TMP4,		0xdd
+	.equ	VDU_TMP5,		0xde
+	.equ	VDU_TMP6,		0xdf
 ;endianness
-VDU_ROW_MULT_HI		= 0xe0
-VDU_ROW_MULT		= 0xe1
-CRFS_STATUS		= 0xe2
-CRFS_OPTIONS		= 0xe3
-OSBYTE_PAR_3		= 0xe4
-OSBYTE_PAR_2		= 0xe5
-MOS_WS			= 0xe6
-AUTO_REPEAT_TIMER	= 0xe7
-OSW_0_PTR		= 0xe8
-OSW_0_PTR_HI		= 0xe9
-RS423_TIMEOUT		= 0xea
-CRFS_ACTIVE		= 0xeb
-KEYNUM_FIRST		= 0xec
-KEYNUM_LAST		= 0xed
+	.equ	VDU_ROW_MULT_HI,	0xe0
+	.equ	VDU_ROW_MULT,		0xe1
+	.equ	CRFS_STATUS,		0xe2
+	.equ	CRFS_OPTIONS,		0xe3
+	.equ	OSBYTE_PAR_3,		0xe4
+	.equ	OSBYTE_PAR_2,		0xe5
+	.equ	MOS_WS,			0xe6
+	.equ	AUTO_REPEAT_TIMER,	0xe7
+	.equ	OSW_0_PTR,		0xe8
+	.equ	OSW_0_PTR_HI,		0xe9
+	.equ	RS423_TIMEOUT,		0xea
+	.equ	CRFS_ACTIVE,		0xeb
+	.equ	KEYNUM_FIRST,		0xec
+	.equ	KEYNUM_LAST,		0xed
 
-OSW_A			= 0xef
-OSW_X			= 0xf0
-OSW_Y			= 0xf1
-TEXT_PTR		= 0xf2
-TEXT_PTR_HI		= 0xf3
-ROM_SELECT		= 0xf4
-RFS_SELECT		= 0xf5
-ROM_PTR			= 0xf6
-ROM_PTR_HI		= 0xf7
-MOS_WS_0		= 0xfa
-MOS_WS_1		= 0xfb
-IRQ_COPY_A		= 0xfc
-ERR_MSG_PTR		= 0xfd
-ERR_MSG_PTR_HI		= 0xfe
-ESCAPE_FLAG		= 0xff
+	.equ	OSW_A,			0xef
+	.equ	OSW_X,			0xf0
+	.equ	OSW_Y,			0xf1
+	.equ	TEXT_PTR,		0xf2
+	.equ	TEXT_PTR_HI,		0xf3
+	.equ	ROM_SELECT,		0xf4
+	.equ	RFS_SELECT,		0xf5
+	.equ	ROM_PTR,		0xf6
+	.equ	ROM_PTR_HI,		0xf7
+	.equ	MOS_WS_0,		0xfa
+	.equ	MOS_WS_1,		0xfb
+	.equ	IRQ_COPY_A,		0xfc
+	.equ	ERR_MSG_PTR,		0xfd
+	.equ	ERR_MSG_PTR_HI,		0xfe
+	.equ	ESCAPE_FLAG,		0xff
 
-STACK			= 0x0100
+	.equ	STACK,			0x0100
 
-VEC_USERV		= 0x0200
-VEC_BRKV		= 0x0202
-VEC_IRQ1V		= 0x0204
-VEC_IRQ2V		= 0x0206
-VEC_OSCLI		= 0x0208
-VEC_OSBYTE		= 0x020a
-VEC_OSWORD		= 0x020c
-VEC_OSWRCH		= 0x020e
-VEC_OSRDCH		= 0x0210
-VEC_OSFILE		= 0x0212
-VEC_OSARGS		= 0x0214
-VEC_OSBGET		= 0x0216
-VEC_OSBPUT		= 0x0218
-VEC_OSGBPB		= 0x021a
-VEC_OSFIND		= 0x021c
-VEC_FSCV		= 0x021e
-VEC_EVNTV		= 0x0220
-VEC_UPTV		= 0x0222
-VEC_NETV		= 0x0224
-VEC_VDUV		= 0x0226
-VEC_KEYV		= 0x0228
-VEC_INSV		= 0x022a
-VEC_REMV		= 0x022c
-VEC_CNPV		= 0x022e
-VEC_IND1V		= 0x0230
-VEC_IND2V		= 0x0232
-VEC_IND3V		= 0x0234
+	.equ	VEC_USERV,		0x0200
+	.equ	VEC_BRKV,		0x0202
+	.equ	VEC_IRQ1V,		0x0204
+	.equ	VEC_IRQ2V,		0x0206
+	.equ	VEC_OSCLI,		0x0208
+	.equ	VEC_OSBYTE,		0x020a
+	.equ	VEC_OSWORD,		0x020c
+	.equ	VEC_OSWRCH,		0x020e
+	.equ	VEC_OSRDCH,		0x0210
+	.equ	VEC_OSFILE,		0x0212
+	.equ	VEC_OSARGS,		0x0214
+	.equ	VEC_OSBGET,		0x0216
+	.equ	VEC_OSBPUT,		0x0218
+	.equ	VEC_OSGBPB,		0x021a
+	.equ	VEC_OSFIND,		0x021c
+	.equ	VEC_FSCV,		0x021e
+	.equ	VEC_EVNTV,		0x0220
+	.equ	VEC_UPTV,		0x0222
+	.equ	VEC_NETV,		0x0224
+	.equ	VEC_VDUV,		0x0226
+	.equ	VEC_KEYV,		0x0228
+	.equ	VEC_INSV,		0x022a
+	.equ	VEC_REMV,		0x022c
+	.equ	VEC_CNPV,		0x022e
+	.equ	VEC_IND1V,		0x0230
+	.equ	VEC_IND2V,		0x0232
+	.equ	VEC_IND3V,		0x0234
 
-VEC_USERV		= 0x0200
-VEC_BRKV		= 0x0202
-VEC_IRQ1V		= 0x0204
-VEC_IRQ2V		= 0x0206
-VEC_OSCLI		= 0x0208
-VEC_OSBYTE		= 0x020a
-VEC_OSWORD		= 0x020c
-VEC_OSWRCH		= 0x020e
-VEC_OSRDCH		= 0x0210
-VEC_OSFILE		= 0x0212
-VEC_OSARGS		= 0x0214
-VEC_OSBGET		= 0x0216
-VEC_OSBPUT		= 0x0218
-VEC_OSGBPB		= 0x021a
-VEC_OSFIND		= 0x021c
-VEC_FSCV		= 0x021e
-VEC_EVNTV		= 0x0220
-VEC_UPTV		= 0x0222
-VEC_NETV		= 0x0224
-VEC_VDUV		= 0x0226
-VEC_KEYV		= 0x0228
-VEC_INSV		= 0x022a
-VEC_REMV		= 0x022c
-VEC_CNPV		= 0x022e
-VEC_IND1V		= 0x0230
-VEC_IND2V		= 0x0232
-VEC_IND3V		= 0x0234
+	.equ	VEC_USERV,		0x0200
+	.equ	VEC_BRKV,		0x0202
+	.equ	VEC_IRQ1V,		0x0204
+	.equ	VEC_IRQ2V,		0x0206
+	.equ	VEC_OSCLI,		0x0208
+	.equ	VEC_OSBYTE,		0x020a
+	.equ	VEC_OSWORD,		0x020c
+	.equ	VEC_OSWRCH,		0x020e
+	.equ	VEC_OSRDCH,		0x0210
+	.equ	VEC_OSFILE,		0x0212
+	.equ	VEC_OSARGS,		0x0214
+	.equ	VEC_OSBGET,		0x0216
+	.equ	VEC_OSBPUT,		0x0218
+	.equ	VEC_OSGBPB,		0x021a
+	.equ	VEC_OSFIND,		0x021c
+	.equ	VEC_FSCV,		0x021e
+	.equ	VEC_EVNTV,		0x0220
+	.equ	VEC_UPTV,		0x0222
+	.equ	VEC_NETV,		0x0224
+	.equ	VEC_VDUV,		0x0226
+	.equ	VEC_KEYV,		0x0228
+	.equ	VEC_INSV,		0x022a
+	.equ	VEC_REMV,		0x022c
+	.equ	VEC_CNPV,		0x022e
+	.equ	VEC_IND1V,		0x0230
+	.equ	VEC_IND2V,		0x0232
+	.equ	VEC_IND3V,		0x0234
 
 ; OSBYTE variables
-OSB_BASE		= 0x0236
-OSB_EXT_VEC		= 0x0238
-OSB_ROM_TABLE		= 0x023a
-OSB_KEY_TABLE		= 0x023c
-OSB_VDU_TABLE		= 0x023e
+	.equ	OSB_BASE,		0x0236
+	.equ	OSB_EXT_VEC,		0x0238
+	.equ	OSB_ROM_TABLE,		0x023a
+	.equ	OSB_KEY_TABLE,		0x023c
+	.equ	OSB_VDU_TABLE,		0x023e
 
-OSB_CFS_TIMEOUT		= 0x0240
-OSB_IN_STREAM		= 0x0241
-OSB_KEY_SEM		= 0x0242
-OSB_OSHWM_DEF		= 0x0243
-OSB_OSHWM_CUR   	= 0x0244
-OSB_RS423_MODE		= 0x0245
-OSB_CHAR_EXPL		= 0x0246
-OSB_CFSRFC_SW		= 0x0247
-OSB_VIDPROC_CTL		= 0x0248
-OSB_VIDPROC_PAL		= 0x0249
-OSB_LAST_ROM		= 0x024a
-OSB_BASIC_ROM		= 0x024b
-OSB_ADC_CHAN		= 0x024c
-OSB_ADC_MAX		= 0x024d
-OSB_ADC_ACC		= 0x024e
-OSB_RS423_USE		= 0x024f
-OSB_RS423_CTL		= 0x0250
-OSB_FLASH_TIME		= 0x0251
-OSB_FLASH_SPC		= 0x0252
-OSB_FLASH_MARK		= 0x0253
-OSB_KEY_DELAY		= 0x0254
-OSB_KEY_REPEAT		= 0x0255
-OSB_EXEC_HND		= 0x0256
-OSB_SPOOL_HND		= 0x0257
-OSB_ESC_BRK		= 0x0258
-OSB_KEY_DISABLE		= 0x0259
-OSB_KEY_STATUS		= 0x025a
-OSB_SER_BUF_EX		= 0x025b
-OSB_SER_BUF_SUP		= 0x025c
-OSB_SER_CAS_FLG		= 0x025d
-OSB_ECONET_INT		= 0x025e
-OSB_OSRDCH_INT		= 0x025f
-OSB_OSWRCH_INT		= 0x0260
-OSB_SPEECH_OFF		= 0x0261
-OSB_SOUND_OFF		= 0x0262
-OSB_BELL_CHAN		= 0x0263
-OSB_BELL_ENV		= 0x0264
-OSB_BELL_FREQ		= 0x0265
-OSB_BELL_LEN		= 0x0266
-OSB_BOOT_DISP		= 0x0267
-OSB_SOFT_KEYLEN		= 0x0268
-OSB_HALT_LINES		= 0x0269
-OSB_VDU_QSIZE		= 0x026a
-OSB_TAB			= 0x026b
-OSB_ESCAPE		= 0x026c
-OSB_CHAR_C0		= 0x026d
-OSB_CHAR_D0		= 0x026e
-OSB_CHAR_E0		= 0x026f
-OSB_CHAR_F0		= 0x0270
-OSB_CHAR_80		= 0x0271
-OSB_CHAR_90		= 0x0272
-OSB_CHAR_a0		= 0x0273
-OSB_CHAR_b0		= 0x0274
-OSB_ESC_ACTION		= 0x0275
-OSB_ESC_EFFECTS		= 0x0276
-OSB_UVIA_IRQ_M		= 0x0277
-OSB_ACIA_IRQ_M		= 0x0278
-OSB_SVIA_IRQ_M		= 0x0279
-OSB_TUBE_FOUND		= 0x027a
-OSB_SPCH_FOUND		= 0x027b
-OSB_OUT_STREAM		= 0x027c
-OSB_CURSOR_STAT		= 0x027d
-OSB_KEYPAD_BASE		= 0x027e
-OSB_SHADOW_RAM		= 0x027f
-OSB_COUNTRY		= 0x0280
-OSB_USER_FLAG		= 0x0281
-OSB_SERPROC		= 0x0282
-OSB_TIME_SWITCH		= 0x0283
-OSB_SOFTKEY_FLG		= 0x0284
-OSB_PRINT_DEST		= 0x0285
-OSB_PRINT_IGN		= 0x0286
-OSB_BRK_INT_JMP		= 0x0287
-OSB_BRK_INT_LO		= 0x0288
-OSB_BRK_INT_HI		= 0x0289
-OSB_FA_UNUSED		= 0x028a
-OSB_FB_UNUSED		= 0x028b
-OSB_CUR_LANG		= 0x028c
-OSB_LAST_BREAK		= 0x028d
-OSB_RAM_PAGES		= 0x028e
-OSB_STARTUP_OPT		= 0x028f
+	.equ	OSB_CFS_TIMEOUT,	0x0240
+	.equ	OSB_IN_STREAM,		0x0241
+	.equ	OSB_KEY_SEM,		0x0242
+	.equ	OSB_OSHWM_DEF,		0x0243
+	.equ	OSB_OSHWM_CUR,		0x0244
+	.equ	OSB_RS423_MODE,		0x0245
+	.equ	OSB_CHAR_EXPL,		0x0246
+	.equ	OSB_CFSRFC_SW,		0x0247
+	.equ	OSB_VIDPROC_CTL,	0x0248
+	.equ	OSB_VIDPROC_PAL,	0x0249
+	.equ	OSB_LAST_ROM,		0x024a
+	.equ	OSB_BASIC_ROM,		0x024b
+	.equ	OSB_ADC_CHAN,		0x024c
+	.equ	OSB_ADC_MAX,		0x024d
+	.equ	OSB_ADC_ACC,		0x024e
+	.equ	OSB_RS423_USE,		0x024f
+	.equ	OSB_RS423_CTL,		0x0250
+	.equ	OSB_FLASH_TIME,		0x0251
+	.equ	OSB_FLASH_SPC,		0x0252
+	.equ	OSB_FLASH_MARK,		0x0253
+	.equ	OSB_KEY_DELAY,		0x0254
+	.equ	OSB_KEY_REPEAT,		0x0255
+	.equ	OSB_EXEC_HND,		0x0256
+	.equ	OSB_SPOOL_HND,		0x0257
+	.equ	OSB_ESC_BRK,		0x0258
+	.equ	OSB_KEY_DISABLE,	0x0259
+	.equ	OSB_KEY_STATUS,		0x025a
+	.equ	OSB_SER_BUF_EX,		0x025b
+	.equ	OSB_SER_BUF_SUP,	0x025c
+	.equ	OSB_SER_CAS_FLG,	0x025d
+	.equ	OSB_ECONET_INT,		0x025e
+	.equ	OSB_OSRDCH_INT,		0x025f
+	.equ	OSB_OSWRCH_INT,		0x0260
+	.equ	OSB_SPEECH_OFF,		0x0261
+	.equ	OSB_SOUND_OFF,		0x0262
+	.equ	OSB_BELL_CHAN,		0x0263
+	.equ	OSB_BELL_ENV,		0x0264
+	.equ	OSB_BELL_FREQ,		0x0265
+	.equ	OSB_BELL_LEN,		0x0266
+	.equ	OSB_BOOT_DISP,		0x0267
+	.equ	OSB_SOFT_KEYLEN,	0x0268
+	.equ	OSB_HALT_LINES,		0x0269
+	.equ	OSB_VDU_QSIZE,		0x026a
+	.equ	OSB_TAB,		0x026b
+	.equ	OSB_ESCAPE,		0x026c
+	.equ	OSB_CHAR_C0,		0x026d
+	.equ	OSB_CHAR_D0,		0x026e
+	.equ	OSB_CHAR_E0,		0x026f
+	.equ	OSB_CHAR_F0,		0x0270
+	.equ	OSB_CHAR_80,		0x0271
+	.equ	OSB_CHAR_90,		0x0272
+	.equ	OSB_CHAR_a0,		0x0273
+	.equ	OSB_CHAR_b0,		0x0274
+	.equ	OSB_ESC_ACTION,		0x0275
+	.equ	OSB_ESC_EFFECTS,	0x0276
+	.equ	OSB_UVIA_IRQ_M,		0x0277
+	.equ	OSB_ACIA_IRQ_M,		0x0278
+	.equ	OSB_SVIA_IRQ_M,		0x0279
+	.equ	OSB_TUBE_FOUND,		0x027a
+	.equ	OSB_SPCH_FOUND,		0x027b
+	.equ	OSB_OUT_STREAM,		0x027c
+	.equ	OSB_CURSOR_STAT,	0x027d
+	.equ	OSB_KEYPAD_BASE,	0x027e
+	.equ	OSB_SHADOW_RAM,		0x027f
+	.equ	OSB_COUNTRY,		0x0280
+	.equ	OSB_USER_FLAG,		0x0281
+	.equ	OSB_SERPROC,		0x0282
+	.equ	OSB_TIME_SWITCH,	0x0283
+	.equ	OSB_SOFTKEY_FLG,	0x0284
+	.equ	OSB_PRINT_DEST,		0x0285
+	.equ	OSB_PRINT_IGN,		0x0286
+	.equ	OSB_BRK_INT_JMP,	0x0287
+	.equ	OSB_BRK_INT_LO,		0x0288
+	.equ	OSB_BRK_INT_HI,		0x0289
+	.equ	OSB_FA_UNUSED,		0x028a
+	.equ	OSB_FB_UNUSED,		0x028b
+	.equ	OSB_CUR_LANG,		0x028c
+	.equ	OSB_LAST_BREAK,		0x028d
+	.equ	OSB_RAM_PAGES,		0x028e
+	.equ	OSB_STARTUP_OPT,	0x028f
 
-VDU_ADJUST		= 0x0290
-VDU_INTERLACE		= 0x0291
+	.equ	VDU_ADJUST,		0x0290
+	.equ	VDU_INTERLACE,		0x0291
 
-TIME_VAL1_MSB		= 0x0292
-TIME_VAL1_LSB		= 0x0296
-TIME_VAL2_MSB		= 0x0297
-TIME_VAL2_LSB		= 0x029b
-COUNTER_MSB		= 0x029c
-COUNTER_LSB		= 0x029f
+	.equ	TIME_VAL1_MSB,		0x0292
+	.equ	TIME_VAL1_LSB,		0x0296
+	.equ	TIME_VAL2_MSB,		0x0297
+	.equ	TIME_VAL2_LSB,		0x029b
+	.equ	COUNTER_MSB,		0x029c
+	.equ	COUNTER_LSB,		0x029f
 
-ROM_TABLE		= 0x02a1
+	.equ	ROM_TABLE,		0x02a1
 
-INKEY_TIMER		= 0x02b1
-INKEY_TIMER_HI		= 0x02b2
-OSW0_MAX_LINE		= 0x02b3
-OSW0_MIN_CHAR		= 0x02b4
-OSW0_MAX_CHAR		= 0x02b5
+	.equ	INKEY_TIMER,		0x02b1
+	.equ	INKEY_TIMER_HI,		0x02b2
+	.equ	OSW0_MAX_LINE,		0x02b3
+	.equ	OSW0_MIN_CHAR,		0x02b4
+	.equ	OSW0_MAX_CHAR,		0x02b5
 
-ADC_CHAN1_LO		= 0x02b6
-ADC_CHAN2_LO		= 0x02b7
-ADC_CHAN3_LO		= 0x02b8
-ADC_CHAN4_LO		= 0x02b9
-ADC_CHAN1_HI		= 0x02ba
-ADC_CHAN2_HI		= 0x02bb
-ADC_CHAN3_HI		= 0x02bc
-ADC_CHAN4_HI		= 0x02bd
-ADC_CHAN_FLAG		= 0x02be
+	.equ	ADC_CHAN1_LO,		0x02b6
+	.equ	ADC_CHAN2_LO,		0x02b7
+	.equ	ADC_CHAN3_LO,		0x02b8
+	.equ	ADC_CHAN4_LO,		0x02b9
+	.equ	ADC_CHAN1_HI,		0x02ba
+	.equ	ADC_CHAN2_HI,		0x02bb
+	.equ	ADC_CHAN3_HI,		0x02bc
+	.equ	ADC_CHAN4_HI,		0x02bd
+	.equ	ADC_CHAN_FLAG,		0x02be
 
-EVENT_ENABLE		= 0x02bf
+	.equ	EVENT_ENABLE,		0x02bf
 
-SOFTKEY_EX_PTR		= 0x02c9
+	.equ	SOFTKEY_EX_PTR,		0x02c9
 
-KEY_REPEAT_CNT		= 0x02ca
-KEY_ROLLOVER_1		= 0x02cb
-KEY_ROLLOVER_2		= 0x02cd
-SOUND_SEMAPHORE		= 0x02ce
+	.equ	KEY_REPEAT_CNT,		0x02ca
+	.equ	KEY_ROLLOVER_1,		0x02cb
+	.equ	KEY_ROLLOVER_2,		0x02cd
+	.equ	SOUND_SEMAPHORE,	0x02ce
 
-BUFFER_0_BUSY		= 0x02cf
-BUFFER_1_BUSY		= 0x02d0
-BUFFER_2_BUSY		= 0x02d1
-BUFFER_3_BUSY		= 0x02d2
-BUFFER_4_BUSY		= 0x02d3
-BUFFER_5_BUSY		= 0x02d4
-BUFFER_6_BUSY		= 0x02d5
-BUFFER_7_BUSY		= 0x02d6
-BUFFER_8_BUSY		= 0x02d7
+	.equ	BUFFER_0_BUSY,		0x02cf
+	.equ	BUFFER_1_BUSY,		0x02d0
+	.equ	BUFFER_2_BUSY,		0x02d1
+	.equ	BUFFER_3_BUSY,		0x02d2
+	.equ	BUFFER_4_BUSY,		0x02d3
+	.equ	BUFFER_5_BUSY,		0x02d4
+	.equ	BUFFER_6_BUSY,		0x02d5
+	.equ	BUFFER_7_BUSY,		0x02d6
+	.equ	BUFFER_8_BUSY,		0x02d7
 
-BUFFER_0_OUT		= 0x02d8
-BUFFER_1_OUT		= 0x02d9
-BUFFER_2_OUT		= 0x02da
-BUFFER_3_OUT		= 0x02db
-BUFFER_4_OUT		= 0x02dc
-BUFFER_5_OUT		= 0x02dd
-BUFFER_6_OUT		= 0x02de
-BUFFER_7_OUT		= 0x02df
-BUFFER_8_OUT		= 0x02e0
+	.equ	BUFFER_0_OUT,		0x02d8
+	.equ	BUFFER_1_OUT,		0x02d9
+	.equ	BUFFER_2_OUT,		0x02da
+	.equ	BUFFER_3_OUT,		0x02db
+	.equ	BUFFER_4_OUT,		0x02dc
+	.equ	BUFFER_5_OUT,		0x02dd
+	.equ	BUFFER_6_OUT,		0x02de
+	.equ	BUFFER_7_OUT,		0x02df
+	.equ	BUFFER_8_OUT,		0x02e0
 
-BUFFER_0_IN 		= 0x02e1
-BUFFER_1_IN 		= 0x02e2
-BUFFER_2_IN 		= 0x02e3
-BUFFER_3_IN 		= 0x02e4
-BUFFER_4_IN 		= 0x02e5
-BUFFER_5_IN 		= 0x02e6
-BUFFER_6_IN 		= 0x02e7
-BUFFER_7_IN 		= 0x02e8
-BUFFER_8_IN 		= 0x02e9
+	.equ	BUFFER_0_IN,		0x02e1
+	.equ	BUFFER_1_IN,		0x02e2
+	.equ	BUFFER_2_IN,		0x02e3
+	.equ	BUFFER_3_IN,		0x02e4
+	.equ	BUFFER_4_IN,		0x02e5
+	.equ	BUFFER_5_IN,		0x02e6
+	.equ	BUFFER_6_IN,		0x02e7
+	.equ	BUFFER_7_IN,		0x02e8
+	.equ	BUFFER_8_IN,		0x02e9
 
-CFS_BLOCK_SZ		= 0x02ea
-CFS_BLOCK_SZ_HI		= 0x02eb
-CFS_BLOCK_FLAG		= 0x02ec
-CFS_LAST_INPUT		= 0x02ed
+	.equ	CFS_BLOCK_SZ,		0x02ea
+	.equ	CFS_BLOCK_SZ_HI,	0x02eb
+	.equ	CFS_BLOCK_FLAG,		0x02ec
+	.equ	CFS_LAST_INPUT,		0x02ed
 
-OSFILE_CB		= 0x02ee
-OSFILE_CB_1		= 0x02ef
-OSFILE_CB_2		= 0x02f0
-OSFILE_CB_3		= 0x02f1
-OSFILE_CB_4		= 0x02f2
-OSFILE_CB_5		= 0x02f3
-OSFILE_CB_6		= 0x02f4
-OSFILE_CB_7		= 0x02f5
-OSFILE_CB_8		= 0x02f6
-OSFILE_CB_9		= 0x02f7
-OSFILE_CB_10		= 0x02f8
-OSFILE_CB_11		= 0x02f9
-OSFILE_CB_12		= 0x02fa
-OSFILE_CB_13		= 0x02fb
-OSFILE_CB_14		= 0x02fc
-OSFILE_CB_15		= 0x02fd
-OSFILE_CB_16		= 0x02fe
-OSFILE_CB_17		= 0x02ff
+	.equ	OSFILE_CB,		0x02ee
+	.equ	OSFILE_CB_1,		0x02ef
+	.equ	OSFILE_CB_2,		0x02f0
+	.equ	OSFILE_CB_3,		0x02f1
+	.equ	OSFILE_CB_4,		0x02f2
+	.equ	OSFILE_CB_5,		0x02f3
+	.equ	OSFILE_CB_6,		0x02f4
+	.equ	OSFILE_CB_7,		0x02f5
+	.equ	OSFILE_CB_8,		0x02f6
+	.equ	OSFILE_CB_9,		0x02f7
+	.equ	OSFILE_CB_10,		0x02f8
+	.equ	OSFILE_CB_11,		0x02f9
+	.equ	OSFILE_CB_12,		0x02fa
+	.equ	OSFILE_CB_13,		0x02fb
+	.equ	OSFILE_CB_14,		0x02fc
+	.equ	OSFILE_CB_15,		0x02fd
+	.equ	OSFILE_CB_16,		0x02fe
+	.equ	OSFILE_CB_17,		0x02ff
 
-VDU_VARS_BASE		= 0x0300
+	.equ	VDU_VARS_BASE,		0x0300
 ;endianness
-VDU_G_WIN_L_HI		= 0x0300
-VDU_G_WIN_L		= 0x0301
+	.equ	VDU_G_WIN_L_HI,		0x0300
+	.equ	VDU_G_WIN_L,		0x0301
 ;endianness
-VDU_G_WIN_B_HI		= 0x0302
-VDU_G_WIN_B		= 0x0303
+	.equ	VDU_G_WIN_B_HI,		0x0302
+	.equ	VDU_G_WIN_B,		0x0303
 ;endianness
-VDU_G_WIN_R_HI		= 0x0304
-VDU_G_WIN_R		= 0x0305
+	.equ	VDU_G_WIN_R_HI,		0x0304
+	.equ	VDU_G_WIN_R,		0x0305
 ;endianness
-VDU_G_WIN_T_HI		= 0x0306
-VDU_G_WIN_T		= 0x0307
-VDU_T_WIN_L		= 0x0308
-VDU_T_WIN_B		= 0x0309
-VDU_T_WIN_R		= 0x030a
-VDU_T_WIN_T		= 0x030b
-
-;endianness
-VDU_G_ORG_XX_HI		= 0x030c
-VDU_G_ORG_XX		= 0x030d
-;endianness
-VDU_G_ORG_YX_HI		= 0x030e
-VDU_G_ORG_YX		= 0x030f
-;endianness
-VDU_G_CUR_XX_HI		= 0x0310
-VDU_G_CUR_XX		= 0x0311
-;endianness
-VDU_G_CUR_YX_HI		= 0x0312
-VDU_G_CUR_YX		= 0x0313
-
-VDU_T_CURS_X		= 0x0318
-VDU_T_CURS_Y		= 0x0319
-VDU_G_CURS_SCAN		= 0x031a
-VDU_QUEUE		= 0x031b
-VDU_QUEUE_1		= 0x031c
-VDU_QUEUE_2		= 0x031d
-VDU_QUEUE_3		= 0x031e
-VDU_QUEUE_4		= 0x031f
-VDU_QUEUE_5		= 0x0320
-VDU_QUEUE_6		= 0x0321
-VDU_QUEUE_7		= 0x0322
-VDU_QUEUE_8		= 0x0323
+	.equ	VDU_G_WIN_T_HI,		0x0306
+	.equ	VDU_G_WIN_T,		0x0307
+	.equ	VDU_T_WIN_L,		0x0308
+	.equ	VDU_T_WIN_B,		0x0309
+	.equ	VDU_T_WIN_R,		0x030a
+	.equ	VDU_T_WIN_T,		0x030b
 
 ;endianness
-VDU_G_CURS_H_HI		= 0x0324
-VDU_G_CURS_H		= 0x0325
+	.equ	VDU_G_ORG_XX_HI,	0x030c
+	.equ	VDU_G_ORG_XX,		0x030d
 ;endianness
-VDU_G_CURS_V_HI		= 0x0326
-VDU_G_CURS_V		= 0x0327
+	.equ	VDU_G_ORG_YX_HI,	0x030e
+	.equ	VDU_G_ORG_YX,		0x030f
+;endianness
+	.equ	VDU_G_CUR_XX_HI,	0x0310
+	.equ	VDU_G_CUR_XX,		0x0311
+;endianness
+	.equ	VDU_G_CUR_YX_HI,	0x0312
+	.equ	VDU_G_CUR_YX,		0x0313
 
-VDU_BITMAP_READ		= 0x0328
-VDU_BITMAP_RD_1		= 0x0329
-VDU_BITMAP_RD_2		= 0x032a
-VDU_BITMAP_RD_3		= 0x032b
-VDU_BITMAP_RD_4		= 0x032c
-VDU_BITMAP_RD_5		= 0x032d
-VDU_BITMAP_RD_6		= 0x032e
-VDU_BITMAP_RD_7		= 0x032f
-VDU_WORKSPACE		= 0x0330
+	.equ	VDU_T_CURS_X,		0x0318
+	.equ	VDU_T_CURS_Y,		0x0319
+	.equ	VDU_G_CURS_SCAN,	0x031a
+	.equ	VDU_QUEUE,		0x031b
+	.equ	VDU_QUEUE_1,		0x031c
+	.equ	VDU_QUEUE_2,		0x031d
+	.equ	VDU_QUEUE_3,		0x031e
+	.equ	VDU_QUEUE_4,		0x031f
+	.equ	VDU_QUEUE_5,		0x0320
+	.equ	VDU_QUEUE_6,		0x0321
+	.equ	VDU_QUEUE_7,		0x0322
+	.equ	VDU_QUEUE_8,		0x0323
+
+;endianness
+	.equ	VDU_G_CURS_H_HI,	0x0324
+	.equ	VDU_G_CURS_H,		0x0325
+;endianness
+	.equ	VDU_G_CURS_V_HI,	0x0326
+	.equ	VDU_G_CURS_V,		0x0327
+
+	.equ	VDU_BITMAP_READ,	0x0328
+	.equ	VDU_BITMAP_RD_1,	0x0329
+	.equ	VDU_BITMAP_RD_2,	0x032a
+	.equ	VDU_BITMAP_RD_3,	0x032b
+	.equ	VDU_BITMAP_RD_4,	0x032c
+	.equ	VDU_BITMAP_RD_5,	0x032d
+	.equ	VDU_BITMAP_RD_6,	0x032e
+	.equ	VDU_BITMAP_RD_7,	0x032f
+	.equ	VDU_WORKSPACE,		0x0330
 
 	; note endianness
-VDU_CRTC_CUR_HI		= 0x034a
-VDU_CRTC_CUR		= 0x034b
+	.equ	VDU_CRTC_CUR_HI,	0x034a
+	.equ	VDU_CRTC_CUR,		0x034b
 
 	; note endianness
-VDU_T_WIN_SZ_HI		= 0x034c
-VDU_T_WIN_SZ		= 0x034d
+	.equ	VDU_T_WIN_SZ_HI,	0x034c
+	.equ	VDU_T_WIN_SZ,		0x034d
 
-VDU_PAGE		= 0x034e
-VDU_BPC			= 0x034f
+	.equ	VDU_PAGE,		0x034e
+	.equ	VDU_BPC,		0x034f
 	; note endianness
-VDU_MEM_HI		= 0x0350
-VDU_MEM			= 0x0351
+	.equ	VDU_MEM_HI,		0x0350
+	.equ	VDU_MEM,		0x0351
 	; note endianness
-VDU_BPR_HI		= 0x0352
-VDU_BPR			= 0x0353
+	.equ	VDU_BPR_HI,		0x0352
+	.equ	VDU_BPR,		0x0353
 
-VDU_MEM_PAGES		= 0x0354
-VDU_MODE		= 0x0355
-VDU_MAP_TYPE		= 0x0356
-VDU_T_FG		= 0x0357
-VDU_T_BG		= 0x0358
-VDU_G_FG		= 0x0359
-VDU_G_BG		= 0x035a
-VDU_P_FG		= 0x035b
-VDU_P_BG		= 0x035c
+	.equ	VDU_MEM_PAGES,		0x0354
+	.equ	VDU_MODE,		0x0355
+	.equ	VDU_MAP_TYPE,		0x0356
+	.equ	VDU_T_FG,		0x0357
+	.equ	VDU_T_BG,		0x0358
+	.equ	VDU_G_FG,		0x0359
+	.equ	VDU_G_BG,		0x035a
+	.equ	VDU_P_FG,		0x035b
+	.equ	VDU_P_BG,		0x035c
 ; endianness
-VDU_JUMPVEC_HI		= 0x035d
-VDU_JUMPVEC		= 0x035e
-VDU_CURS_PREV		= 0x035f
-VDU_COL_MASK		= 0x0360
-VDU_PIX_BYTE		= 0x0361
-VDU_MASK_RIGHT		= 0x0362
-VDU_MASK_LEFT		= 0x0363
-VDU_TI_CURS_X		= 0x0364
-VDU_TI_CURS_Y		= 0x0365
-VDU_TTX_CURSOR		= 0x0366
-VDU_FONT_FLAGS		= 0x0367
-VDU_FONTLOC_20		= 0x0368
-VDU_FONTLOC_40		= 0x0369
-VDU_FONTLOC_60		= 0x036a
-VDU_FONTLOC_80		= 0x036b
-VDU_FONTLOC_A0		= 0x036c
-VDU_FONTLOC_B0		= 0x036d
-VDU_FONTLOC_C0		= 0x036e
-VDU_PALETTE		= 0x036f
+	.equ	VDU_JUMPVEC_HI,		0x035d
+	.equ	VDU_JUMPVEC,		0x035e
+	.equ	VDU_CURS_PREV,		0x035f
+	.equ	VDU_COL_MASK,		0x0360
+	.equ	VDU_PIX_BYTE,		0x0361
+	.equ	VDU_MASK_RIGHT,		0x0362
+	.equ	VDU_MASK_LEFT,		0x0363
+	.equ	VDU_TI_CURS_X,		0x0364
+	.equ	VDU_TI_CURS_Y,		0x0365
+	.equ	VDU_TTX_CURSOR,		0x0366
+	.equ	VDU_FONT_FLAGS,		0x0367
+	.equ	VDU_FONTLOC_20,		0x0368
+	.equ	VDU_FONTLOC_40,		0x0369
+	.equ	VDU_FONTLOC_60,		0x036a
+	.equ	VDU_FONTLOC_80,		0x036b
+	.equ	VDU_FONTLOC_A0,		0x036c
+	.equ	VDU_FONTLOC_B0,		0x036d
+	.equ	VDU_FONTLOC_C0,		0x036e
+	.equ	VDU_PALETTE,		0x036f
 
-BPUT_FILENAME		= 0x0380
-BPUT_LOAD_LO		= 0x038c
-BPUT_LOAD_HI		= 0x038d
-BPUT_LOAD_VHI		= 0x038e
-BPUT_LOAD_XHI		= 0x038f
-BPUT_EXEC_LO		= 0x0390
-BPUT_EXEC_HI		= 0x0391
-BPUT_EXEC_VHI		= 0x0392
-BPUT_EXEC_XHI		= 0x0393
-BPUT_BLK_NUM		= 0x0394
-BPUT_BLK_NUM_HI		= 0x0395
-BPUT_BLK_LEN		= 0x0396
-BPUT_BLK_LEN_HI		= 0x0397
-BPUT_BLK_FLAG		= 0x0398
-BPUT_RFS_LO		= 0x0399
-BPUT_RFS_HI		= 0x039a
-BPUT_RFS_VHI		= 0x039b
-BPUT_RFS_XHI		= 0x039c
+	.equ	BPUT_FILENAME,		0x0380
+	.equ	BPUT_LOAD_LO,		0x038c
+	.equ	BPUT_LOAD_HI,		0x038d
+	.equ	BPUT_LOAD_VHI,		0x038e
+	.equ	BPUT_LOAD_XHI,		0x038f
+	.equ	BPUT_EXEC_LO,		0x0390
+	.equ	BPUT_EXEC_HI,		0x0391
+	.equ	BPUT_EXEC_VHI,		0x0392
+	.equ	BPUT_EXEC_XHI,		0x0393
+	.equ	BPUT_BLK_NUM,		0x0394
+	.equ	BPUT_BLK_NUM_HI,	0x0395
+	.equ	BPUT_BLK_LEN,		0x0396
+	.equ	BPUT_BLK_LEN_HI,	0x0397
+	.equ	BPUT_BLK_FLAG,		0x0398
+	.equ	BPUT_RFS_LO,		0x0399
+	.equ	BPUT_RFS_HI,		0x039a
+	.equ	BPUT_RFS_VHI,		0x039b
+	.equ	BPUT_RFS_XHI,		0x039c
 
-CFS_BPUT_OFFSET		= 0x039d
-CFS_BGET_OFFSET		= 0x039e
-CFS_BGET_FILE		= 0x03a7
+	.equ	CFS_BPUT_OFFSET,	0x039d
+	.equ	CFS_BGET_OFFSET,	0x039e
+	.equ	CFS_BGET_FILE,		0x03a7
 
-CFS_FILENAME		= 0x03b2
-CFS_LOAD_LO		= 0x03be
-CFS_LOAD_HI		= 0x03bf
-CFS_LOAD_VHI		= 0x03c0
-CFS_LOAD_XHI		= 0x03c1
-CFS_EXEC_LO		= 0x03c2
-CFS_EXEC_HI		= 0x03c3
-CFS_EXEC_VHI		= 0x03c4
-CFS_EXEC_XHI		= 0x03c5
-CFS_BLK_NUM		= 0x03c6
-CFS_BLK_NUM_HI		= 0x03c7
-CFS_BLK_LEN		= 0x03c8
-CFS_BLK_LEN_HI		= 0x03c9
-CFS_BLK_FLAG		= 0x03ca
-CFS_RFS_LO		= 0x03cb
-CFS_RFS_HI		= 0x03cc
-CFS_RFS_VHI		= 0x03cd
-CFS_RFS_XHI		= 0x03ce
-CFS_CRC			= 0x03cf
-CFS_CRC_HI		= 0x03d0
-SEQ_BLOCK_GAP		= 0x03d1
-CFS_FIND_NAME		= 0x03d2
-CFS_BLK_GET		= 0x03dd
-CFS_BLK_GET_HI		= 0x03de
-CFS_LAST_FLAGS		= 0x03df
+	.equ	CFS_FILENAME,		0x03b2
+	.equ	CFS_LOAD_LO,		0x03be
+	.equ	CFS_LOAD_HI,		0x03bf
+	.equ	CFS_LOAD_VHI,		0x03c0
+	.equ	CFS_LOAD_XHI,		0x03c1
+	.equ	CFS_EXEC_LO,		0x03c2
+	.equ	CFS_EXEC_HI,		0x03c3
+	.equ	CFS_EXEC_VHI,		0x03c4
+	.equ	CFS_EXEC_XHI,		0x03c5
+	.equ	CFS_BLK_NUM,		0x03c6
+	.equ	CFS_BLK_NUM_HI,		0x03c7
+	.equ	CFS_BLK_LEN,		0x03c8
+	.equ	CFS_BLK_LEN_HI,		0x03c9
+	.equ	CFS_BLK_FLAG,		0x03ca
+	.equ	CFS_RFS_LO,		0x03cb
+	.equ	CFS_RFS_HI,		0x03cc
+	.equ	CFS_RFS_VHI,		0x03cd
+	.equ	CFS_RFS_XHI,		0x03ce
+	.equ	CFS_CRC,		0x03cf
+	.equ	CFS_CRC_HI,		0x03d0
+	.equ	SEQ_BLOCK_GAP,		0x03d1
+	.equ	CFS_FIND_NAME,		0x03d2
+	.equ	CFS_BLK_GET,		0x03dd
+	.equ	CFS_BLK_GET_HI,		0x03de
+	.equ	CFS_LAST_FLAGS,		0x03df
 
-BUFFER_KEYBOARD		= 0x03e0
+	.equ	BUFFER_KEYBOARD,	0x03e0
 
-TUBE_ENTRY		= 0x0400
-TUBE_ENTRY_1		= 0x0403
-TUBE_ENTRY_2		= 0x0406
+	.equ	TUBE_ENTRY,		0x0400
+	.equ	TUBE_ENTRY_1,		0x0403
+	.equ	TUBE_ENTRY_2,		0x0406
 
 ; note these addresses are all offset by 4 bytes due to the fact that the sound irq and buffer 
 ; code indexes these as 4..7 as opposed to 0..3 of the SOUND/OSWORD 7 commands
 ; 
 ;.export SOUND_WORKSPACE	= 0x0800
-SOUND_QUEUE_OCC		= 0x0804-4
-SOUND_AMP_CUR		= 0x0808-4			; current amplitude of the playing sound
-SOUND_AMP_PHASE_CUR	= 0x080C-4			; current amplitude phase of envelope 0..3
-SOUND_AMP_BASE_PITCH	= 0x0810-4
-SOUND_PITCH_PHASE_CUR	= 0x0814-4
-SOUND_PITCH_PH_STEPS	= 0x0818-4
-SOUND_DURATION		= 0x081C-4			; duration from SOUND command
-SOUND_DURATION_SUB	= 0x0820-4			; counts down from 5..0 to give 50ms per duration above
-SOUND_ENVELOPE_OFFS	= 0x0824-4			; offset into envelope or -1 for no envelope
-SOUND_ENV_STEPREPEAT	= 0x0828-4			; step length, b7=repeat flag
-SOUND_SYNC_FLAG		= 0x082C-4
-SOUND_SYNC_HOLD_PARAM	= 0x0830-4
-SOUND_PITCH_SETTING	= 0x0834-4
-SOUND_PITCH_DEV		= 0x0838-4
+	.equ	SOUND_QUEUE_OCC,	0x0804-4
+	.equ	SOUND_AMP_CUR,		0x0808-4			; current amplitude of the playing sound
+	.equ	SOUND_AMP_PHASE_CUR,	0x080C-4			; current amplitude phase of envelope 0..3
+	.equ	SOUND_AMP_BASE_PITCH,	0x0810-4
+	.equ	SOUND_PITCH_PHASE_CUR,	0x0814-4
+	.equ	SOUND_PITCH_PH_STEPS,	0x0818-4
+	.equ	SOUND_DURATION,		0x081C-4			; duration from SOUND command
+	.equ	SOUND_DURATION_SUB,	0x0820-4			; counts down from 5..0 to give 50ms per duration above
+	.equ	SOUND_ENVELOPE_OFFS,	0x0824-4			; offset into envelope or -1 for no envelope
+	.equ	SOUND_ENV_STEPREPEAT,	0x0828-4			; step length, b7=repeat flag
+	.equ	SOUND_SYNC_FLAG,	0x082C-4
+	.equ	SOUND_SYNC_HOLD_PARAM,	0x0830-4
+	.equ	SOUND_PITCH_SETTING,	0x0834-4
+	.equ	SOUND_PITCH_DEV,	0x0838-4
 
-SOUND_SYNC_CHANS	= 0x0838
-SOUND_AMP_STEP		= 0x0839
-SOUND_AMP_TARGET	= 0x083a
-SOUND_SYNC_HOLD_COUNT	= 0x083b
-SOUND_WS_0		= 0x083c
-SOUND_FREQ_LO		= 0x083d
-SOUND_FREQ_HI		= 0x083e
-SOUND_WS_3		= 0x083f
+	.equ	SOUND_SYNC_CHANS,	0x0838
+	.equ	SOUND_AMP_STEP,		0x0839
+	.equ	SOUND_AMP_TARGET,	0x083a
+	.equ	SOUND_SYNC_HOLD_COUNT,	0x083b
+	.equ	SOUND_WS_0,		0x083c
+	.equ	SOUND_FREQ_LO,		0x083d
+	.equ	SOUND_FREQ_HI,		0x083e
+	.equ	SOUND_WS_3,		0x083f
 
-BUFFER_SOUND_0		= 0x0840
-BUFFER_SOUND_1		= 0x0850
-BUFFER_SOUND_2		= 0x0860
-BUFFER_SOUND_3		= 0x0870
-BUFFER_PRINTER		= 0x0880
+	.equ	BUFFER_SOUND_0,		0x0840
+	.equ	BUFFER_SOUND_1,		0x0850
+	.equ	BUFFER_SOUND_2,		0x0860
+	.equ	BUFFER_SOUND_3,		0x0870
+	.equ	BUFFER_PRINTER,		0x0880
 
-ENV_STEP		= 0x08c0
-ENV_PI1			= 0x08c1
-ENV_PI2			= 0x08c2
-ENV_PI3			= 0x08c3
-ENV_PN1			= 0x08c4
-ENV_PN2			= 0x08c5
-ENV_PN3			= 0x08c6
-ENV_AA			= 0x08c7
-ENV_AD			= 0x08c8
-ENV_AS			= 0x08c9
-ENV_AR			= 0x08ca
-ENV_ALA			= 0x08cb
-ENV_ALD			= 0x08cc
+	.equ	ENV_STEP,		0x08c0
+	.equ	ENV_PI1,		0x08c1
+	.equ	ENV_PI2,		0x08c2
+	.equ	ENV_PI3,		0x08c3
+	.equ	ENV_PN1,		0x08c4
+	.equ	ENV_PN2,		0x08c5
+	.equ	ENV_PN3,		0x08c6
+	.equ	ENV_AA,			0x08c7
+	.equ	ENV_AD,			0x08c8
+	.equ	ENV_AS,			0x08c9
+	.equ	ENV_AR,			0x08ca
+	.equ	ENV_ALA,		0x08cb
+	.equ	ENV_ALD,		0x08cc
 
-BUFFER_RS423_TX		= 0x0900
-BUFFER_RS423_RX		= 0x0a00
+	.equ	BUFFER_RS423_TX,	0x0900
+	.equ	BUFFER_RS423_RX,	0x0a00
 
-SOFTKEYS		= 0x0b00
+	.equ	SOFTKEYS,		0x0b00
 
-NMI_HANDLER		= 0x0d00
+	.equ	NMI_HANDLER,		0x0d00
 
-ROM_LANGUAGE		= 0x8000
-ROM_SERVICE		= 0x8003
-ROM_TYPE		= 0x8006
-ROM_CC_OFFSET		= 0x8007
+	.equ	ROM_LANGUAGE,		0x8000
+	.equ	ROM_SERVICE,		0x8003
+	.equ	ROM_TYPE,		0x8006
+	.equ	ROM_CC_OFFSET,		0x8007
 
-FRED			= 0xfc00
-JIM			= 0xfd00
-SHEILA			= 0xfe00
+	.equ	FRED,			0xfc00
+	.equ	JIM,			0xfd00
+	.equ	SHEILA,			0xfe00
 
-CRTC_ADDRESS		= 0xfe00
-CRTC_DATA		= 0xfe01
-CRTC_BORDER		= 0xfe02
+	.equ	CRTC_ADDRESS,		0xfe00
+	.equ	CRTC_DATA,		0xfe01
+	.equ	CRTC_BORDER,		0xfe02
 
-ACIA_CSR		= 0xfe08
-ACIA_TXRX		= 0xfe09
+	.equ	ACIA_CSR,		0xfe08
+	.equ	ACIA_TXRX,		0xfe09
 
-SERIAL_ULA		= 0xfe10
+	.equ	SERIAL_ULA,		0xfe10
 
-ADLC			= 0xfe18
+	.equ	ADLC,			0xfe18
 
-VID_ULA_CTRL		= 0xfe20
-VID_ULA_PALETTE		= 0xfe21
+	.equ	VID_ULA_CTRL,		0xfe20
+	.equ	VID_ULA_PALETTE,	0xfe21
 
-ROM_LATCH		= 0xfe30
+	.equ	ROM_LATCH,		0xfe30
 
-SYS_VIA_IORB		= 0xfe40
-SYS_VIA_IORA		= 0xfe41
-SYS_VIA_DDRB		= 0xfe42
-SYS_VIA_DDRA		= 0xfe43
-SYS_VIA_T1C_L		= 0xfe44
-SYS_VIA_T1C_H		= 0xfe45
-SYS_VIA_T1L_L		= 0xfe46
-SYS_VIA_T1L_H		= 0xfe47
-SYS_VIA_T2C_L		= 0xfe48
-SYS_VIA_T2C_H		= 0xfe49
-SYS_VIA_SHIFT		= 0xfe4a
-SYS_VIA_ACR		= 0xfe4b
-SYS_VIA_PCR		= 0xfe4c
-SYS_VIA_IFR		= 0xfe4d
-SYS_VIA_IER		= 0xfe4e
-SYS_VIA_IORA_NH		= 0xfe4f
+	.equ	SYS_VIA_IORB,		0xfe40
+	.equ	SYS_VIA_IORA,		0xfe41
+	.equ	SYS_VIA_DDRB,		0xfe42
+	.equ	SYS_VIA_DDRA,		0xfe43
+	.equ	SYS_VIA_T1C_L,		0xfe44
+	.equ	SYS_VIA_T1C_H,		0xfe45
+	.equ	SYS_VIA_T1L_L,		0xfe46
+	.equ	SYS_VIA_T1L_H,		0xfe47
+	.equ	SYS_VIA_T2C_L,		0xfe48
+	.equ	SYS_VIA_T2C_H,		0xfe49
+	.equ	SYS_VIA_SHIFT,		0xfe4a
+	.equ	SYS_VIA_ACR,		0xfe4b
+	.equ	SYS_VIA_PCR,		0xfe4c
+	.equ	SYS_VIA_IFR,		0xfe4d
+	.equ	SYS_VIA_IER,		0xfe4e
+	.equ	SYS_VIA_IORA_NH,	0xfe4f
 
-USR_VIA_IORB		= 0xfe60
-USR_VIA_IORA		= 0xfe61
-USR_VIA_DDRB		= 0xfe62
-USR_VIA_DDRA		= 0xfe63
-USR_VIA_T1C_L		= 0xfe64
-USR_VIA_T1C_H		= 0xfe65
-USR_VIA_T1L_L		= 0xfe66
-USR_VIA_T1L_H		= 0xfe67
-USR_VIA_T2C_L		= 0xfe68
-USR_VIA_T2C_H		= 0xfe69
-USR_VIA_SHIFT		= 0xfe6a
-USR_VIA_ACR		= 0xfe6b
-USR_VIA_PCR		= 0xfe6c
-USR_VIA_IFR		= 0xfe6d
-USR_VIA_IER		= 0xfe6e
-USR_VIA_IORA_NH		= 0xfe6f
+	.equ	USR_VIA_IORB,		0xfe60
+	.equ	USR_VIA_IORA,		0xfe61
+	.equ	USR_VIA_DDRB,		0xfe62
+	.equ	USR_VIA_DDRA,		0xfe63
+	.equ	USR_VIA_T1C_L,		0xfe64
+	.equ	USR_VIA_T1C_H,		0xfe65
+	.equ	USR_VIA_T1L_L,		0xfe66
+	.equ	USR_VIA_T1L_H,		0xfe67
+	.equ	USR_VIA_T2C_L,		0xfe68
+	.equ	USR_VIA_T2C_H,		0xfe69
+	.equ	USR_VIA_SHIFT,		0xfe6a
+	.equ	USR_VIA_ACR,		0xfe6b
+	.equ	USR_VIA_PCR,		0xfe6c
+	.equ	USR_VIA_IFR,		0xfe6d
+	.equ	USR_VIA_IER,		0xfe6e
+	.equ	USR_VIA_IORA_NH,	0xfe6f
 
-FDC_CSR			= 0xfe80
-FDC_PRR			= 0xfe81
-FDC_RESET		= 0xfe82
-FDC_ILLEGAL		= 0xfe83
-FDC_DATA		= 0xfe84
+	.equ	FDC_CSR,		0xfe80
+	.equ	FDC_PRR,		0xfe81
+	.equ	FDC_RESET,		0xfe82
+	.equ	FDC_ILLEGAL,		0xfe83
+	.equ	FDC_DATA,		0xfe84
 
-ADLC_CSR1		= 0xfea0
-ADLC_CSR2_3		= 0xfea1
-ADLC_TXRX_FC		= 0xfea2
-ADLC_TXRX_FT		= 0xfea3
+	.equ	ADLC_CSR1,		0xfea0
+	.equ	ADLC_CSR2_3,		0xfea1
+	.equ	ADLC_TXRX_FC,		0xfea2
+	.equ	ADLC_TXRX_FT,		0xfea3
 
-ADC_SR			= 0xfec0
-ADC_HI			= 0xfec1
-ADC_LO			= 0xfec2
+	.equ	ADC_SR,			0xfec0
+	.equ	ADC_HI,			0xfec1
+	.equ	ADC_LO,			0xfec2
 
-TUBE_FIFO1_SR		= 0xfee0
-TUBE_FIFO1		= 0xfee1
-TUBE_FIFO2_SR		= 0xfee2
-TUBE_FIFO2		= 0xfee3
-TUBE_FIFO3_SR		= 0xfee4
-TUBE_FIFO3		= 0xfee5
-TUBE_FIFO4_SR		= 0xfee6
-TUBE_FIFO4		= 0xfee7
+	.equ	TUBE_FIFO1_SR,		0xfee0
+	.equ	TUBE_FIFO1,		0xfee1
+	.equ	TUBE_FIFO2_SR,		0xfee2
+	.equ	TUBE_FIFO2,		0xfee3
+	.equ	TUBE_FIFO3_SR,		0xfee4
+	.equ	TUBE_FIFO3,		0xfee5
+	.equ	TUBE_FIFO4_SR,		0xfee6
+	.equ	TUBE_FIFO4,		0xfee7
 
 
 
-		.area CODE (ABS)
-
-		.org	0xE00
+		.text
 
 		lds	#STACK + 0xFF
 
@@ -805,13 +801,13 @@ bclp1:		ldx	zp_ptr1
 ;*************************************************************************************
 
 
-		.bndry	256
+		.align	8
 font:		
 		.incbin "Bauhaus.ch8"			; the 6800 gets a cheesy '70s font
 font_end:
 
-		.bndry  256
-VDU_DRIVER_PAGE=.
+		.align  8
+VDU_DRIVER_PAGE:
 
 STARTUP:		jmp 	_VDU_INIT_MODE
 			.byte	0x0d
@@ -856,29 +852,29 @@ _COL4_MASK_TAB:		.byte	0x00				; 00000000
 
 ;****** VDU ENTRY POINT LO	 LOOK UP TABLE******
 
-	.macro vdu_lo, addr
-			.byte	<addr
+	.macro vdu_lo	addr
+			.byte	<\addr
 	.endm
 
 	; NOTE: this encoding is different to MOS1.20 to allow assembly at low addresses
-	.macro vdu_hi, addr, count
-		.if count
-			.byte	(>(addr - VDU_DRIVER_PAGE) << 4) + ((16 - count)&0xF)
+	.macro vdu_hi addr, count
+		.if \count
+			.byte	(>(\addr - VDU_DRIVER_PAGE) << 4) + ((16 - \count)&0xF)
 		.else
-			.byte 	0x80 | (>(addr - VDU_DRIVER_PAGE) << 4)
+			.byte 	0x80 | (>(\addr - VDU_DRIVER_PAGE) << 4)
 		.endif
 	.endm
 
 	; TODO: make smaller!
-	.macro 	SWAP_VDU, var1, var2, n
-	.if ge, var2 - var1
-		ldx	#var1
-		ldab	#var2-var1
+	.macro 	SWAP_VDU var1, var2, n
+	.if \var2 > \var1
+		ldx	#\var1
+		ldab	#\var2-\var1
 	.else
-		ldx	#var2
-		ldab	#var1-var2
+		ldx	#\var2
+		ldab	#\var1-\var2
 	.endif
-		ldaa	#n
+		ldaa	#\n
 		jsr	VDU_SWAP
 	.endm
 
@@ -1820,7 +1816,7 @@ _BC805:			anda	VDU_COL_MASK			; number of logical colours less 1
 			pulb
 			ldx	#VDU_T_FG
 			jsr	my_ABX
-			staa	,X				; colour Y=0=text fgnd 1= text bkgnd 2=graphics fg etc
+			staa	0,X				; colour Y=0=text fgnd 1= text bkgnd 2=graphics fg etc
 			cmpb	#0x02				; If Y>1
 			bhs	_BC82C				; then its graphics so C82C else
 			ldaa	VDU_T_FG			; foreground text colour

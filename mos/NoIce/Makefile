@@ -1,23 +1,32 @@
-AS=as6800
-ASOPT=-l -o -s
-LD=aslink
-LDOPT=-i -o
+AS=vasm6800_std
+ASFLAGS=-m6800 
+LD=vlink
+LDFLAGS=-m -Mmapfile -b rawbin1 -nowarn=22 -Cvbcc -T./vlink.cmd -nostdlib 
 
 BUILD=build
-TARG=mon6800
-OBJS=mon6800
+TARGETS=mon6800
 HOSTFS=~/hostfs/test6800
 
-all:: $(BUILD)/$(TARG).rom
-	cp $(BUILD)/$(TARG).rom $(HOSTFS)
-	cp $(TARG).rom.inf $(HOSTFS)
+mon6800_OBJS=mon6800.o
 
-$(BUILD)/%.rel $(BUILD)/%.lst $(BUILD)/%.sym: %.asm
-	$(AS) $(ASOPT) $(basename $@) $<
+mon6800_OBJS_B=$(addprefix $(BUILD)/, $(mon6800_OBJS))
 
-$(BUILD)/$(TARG).ihx: $(addprefix $(BUILD)/, $(addsuffix .rel, $(OBJS)))
-	$(LD) $(LDOPT) $@ $<
+TARGETS2=$(addsuffix .rom, $(addprefix $(BUILD)/, $(TARGETS)))
 
-$(BUILD)/$(TARG).rom: $(BUILD)/$(TARG).ihx
-	hex2bin 0xC000 $< $@
+X := $(shell mkdir $(BUILD))
 
+all:: $(TARGETS2)
+
+$(BUILD)/%.o: %.asm
+	$(AS) $(ASFLAGS) -Fvobj -o $@ -L $(basename $@).lst $<
+
+
+$(BUILD)/mon6800.rom: $(mon6800_OBJS_B)
+	$(LD) $(LDFLAGS) -M$@.map -o $@ -symfile $(basename $@).sym -symfmt "DEF %s 0x%08llx" $(filter %.o, $^) 
+	cp $@ $(HOSTFS)
+	cp mon6800.rom.inf $(HOSTFS)
+
+clean::
+	-rm $(mon6800_OBJS_B)
+	-rm $(TARGETS2) 
+	-rm $(BUILD)/*.lst

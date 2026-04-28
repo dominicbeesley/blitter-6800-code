@@ -9,10 +9,10 @@
 ; FFF8-FFFF and expects BBC Model B Hardware in Page FE (Sheila)
 ;
 ;  Hardware definitions
-		.area ROM (ABS)
-		RAM_START	=	0xA00			;START OF MONITOR RAM
-ROM_START	=	0xC000			;START OF MONITOR CODE
-HARD_VECT	=	0xFFF8			;START OF HARDWARE VECTORS
+		
+		.equ RAM_START,	0xA00		;START OF MONITOR RAM
+		.equ ROM_START,	0xC000		;START OF MONITOR CODE
+		.equ HARD_VECT,	0xFFF8		;START OF HARDWARE VECTORS
 ;
 ;
 ;============================================================================
@@ -20,65 +20,66 @@ HARD_VECT	=	0xFFF8			;START OF HARDWARE VECTORS
 ;============================================================================
 ;
 ;  Put you UART equates here
-SER_STATUS	=     	0xFE08         		; ACIA CTL/STATUS
-SER_RXDATA	=	0xFE09			; ACIA RX Register
-SER_TXDATA	=     	0xFE09			; ACIA TX register
-SER_ULA		=	0xFE10
+		.equ	SER_STATUS,	0xFE08	; ACIA CTL/STATUS
+		.equ	SER_RXDATA,	0xFE09	; ACIA RX Register
+		.equ	SER_TXDATA,	0xFE09	; ACIA TX register
+		.equ	SER_ULA,		0xFE10
 
-RXRDY		=	0x01
-TXRDY		=     	0x02
+		.equ	RXRDY,		0x01
+		.equ	TXRDY,		0x02
 
-ACIA_CTL_BYTE	=	0x2 + 0x14 + 0x00	; 8n1 x64 RTS low no interrupts
-SER_ULA_BYTE	=	0x40			; serial 19200
+		.equ	ACIA_CTL_BYTE,	0x2 + 0x14 + 0x00	
+						; 8n1 x64 RTS low no interrupts
+		.equ	SER_ULA_BYTE,	0x40	; serial 19200
 		;
 ;============================================================================
 ;  RAM definitions:
-		.org     RAM_START
+		.section	RAM, "aurwn"
 ;; ;
 ;; ;  Initial user stack
 ;; ;  (Size and location is user option - at least 7 bytes to accept an SWI!)
 ;; ;  6800 SP points at NEXT BYTE TO USE, rather than at last used byte
 ;; ;  like most processors.  Thus, init SP to TOP-1 of stack space
-;; 		.ds	63
-;; INITSTACK:      .ds	1
-INITSTACK	= 0x1FF
+;; 		.space	63
+;; INITSTACK:      .space	1
+		.equ	INITSTACK, 0x1FF
 ;
 ;  Monitor stack
 ;  (Calculated use is at most 7 bytes [TODO:CHECK].  Leave plenty of spare)
 ;  6800 SP points at NEXT BYTE TO USE, rather than at last used byte
 ;  like most processors.  Thus, init SP to TOP-1 of stack space
-		.ds	15
-MONSTACK:	.ds	1
+		.space	15
+MONSTACK:	.space	1
 ;
 ;  Target registers:  order must match that in TRGHC11.C
 TASK_REGS:
-REG_STATE:	.ds     1
-REG_PAGE:	.ds     1
-REG_SP:		.ds     2
-REG_Y:		.ds     2
-REG_X:		.ds     2
-REG_B:		.ds     1               	;B BEFORE A, SO D IS LEAST SIG. FIRST
-REG_A:		.ds     1
-REG_CC:		.ds     1
-REG_PC:		.ds     2
-TASK_REG_SZ	=     .-TASK_REGS
+REG_STATE:	.space     1
+REG_PAGE:	.space     1
+REG_SP:		.space     2
+REG_X:		.space     2
+REG_B:		.space     1               	;B BEFORE A, SO D IS LEAST SIG. FIRST
+REG_A:		.space     1
+REG_CC:		.space     1
+REG_PC:		.space     2
+TASK_REGS_END:
+		.equ	TASK_REG_SZ,	TASK_REGS_END - TASK_REGS
 ;
 ;  Communications buffer
 ;  (Must be at least as long as the longer of TASK_REG_SZ or TSTG_SIZE.
 ;  At least 19 bytes recommended.  Larger values may improve speed of NoICE
 ;  download and memory move commands.)
-COMBUF_SIZE	=	128			;DATA SIZE FOR COMM BUFFER
-COMBUF:		.ds	2+COMBUF_SIZE+1		;BUFFER ALSO HAS FN, LEN, AND CHECK
+		.equ	COMBUF_SIZE, 128		;DATA SIZE FOR COMM BUFFER
+COMBUF:		.space	2+COMBUF_SIZE+1		;BUFFER ALSO HAS FN, LEN, AND CHECK
 ;
-WKSP_PTR1:	.ds	2
-WKSP_PTR2:	.ds	2
-WKSP_PTR3:	.ds	2
-WKSP_PTR4:	.ds	2
+WKSP_PTR1:	.space	2
+WKSP_PTR2:	.space	2
+WKSP_PTR3:	.space	2
+WKSP_PTR4:	.space	2
 
-RAM_END		=	.			;ADDRESS OF TOP+1 OF RAM
+RAM_END:						;ADDRESS OF TOP+1 OF RAM
 ;
 ;===========================================================================
-		.org     ROM_START
+		.section CODE, "acrx"
 ;
 ;  Power on reset
 RESET:
@@ -99,13 +100,41 @@ RES10:
 ;
 ;  Initialize your UART here
 
-		LDAA	#3
+		LDAA	#ACIA_CTL_BYTE | 3		
 		STAA	SER_STATUS
+		NOP
+		NOP
+		NOP
+		NOP
+		STAA	SER_STATUS
+		NOP
+		NOP
+		NOP
+		NOP
 
-		LDAA    #ACIA_CTL_BYTE
+
+		LDAA	#ACIA_CTL_BYTE
 		STAA	SER_STATUS
+		NOP
+		NOP
+		NOP
+		NOP
 		LDAA	#SER_ULA_BYTE
 		STAA	SER_ULA
+		NOP
+		NOP
+		NOP
+		NOP
+		NOP
+
+		LDA	#'D'
+		JSR	PUTCHAR
+		LDA	#'O'
+		JSR	PUTCHAR
+		LDA	#'M'
+		JSR	PUTCHAR
+
+
 ;
 ;  Initialize user registers
 		LDAA    #INITSTACK/256
@@ -119,8 +148,6 @@ RES10:
 		STAA	REG_B
 		STAA	REG_X
 		STAA	REG_X+1
-		STAA	REG_Y
-		STAA	REG_Y+1
 ;
 ;  Initialize memory paging variables and hardware (if any)
 		STAA	REG_PAGE		;NO PAGE YET
@@ -175,35 +202,37 @@ PC10:		LDAA	SER_STATUS      	;CHECK TX STATUS
 ;======================================================================
 ;  Response string for GET TARGET STATUS request
 ;  Reply describes target:
-TSTG:		.db	3                       ;2: PROCESSOR TYPE = 68HC11
-		.db	COMBUF_SIZE             ;3: SIZE OF COMMUNICATIONS BUFFER
-		.db	0x80                    ;4: has CALL
-		.dw	0                       ;5,6: BOTTOM OF PAGED MEM
-		.dw	0                       ;7,8: TOP OF PAGED MEM
-		.db	B1-B0                   ;9 BREAKPOINT INSTR LENGTH
+TSTG:		.byte	11			;2: PROCESSOR TYPE = 6801
+		.byte	COMBUF_SIZE		;3: SIZE OF COMMUNICATIONS BUFFER
+		.byte	0x00			;4: hasn't CALL
+		.word	0			;5,6: BOTTOM OF PAGED MEM
+		.word	0			;7,8: TOP OF PAGED MEM
+		.byte	B1-B0			;9 BREAKPOINT INSTR LENGTH
 B0:		SWI				;10+ BREKAPOINT INSTRUCTION
-B1:      	.ascii	'6800 monitor V1.0 Dossy'   ;DESCRIPTION, ZERO
-		.db	0
-		.db	0                       ;page of CALL breakpoint
-		.dw	B0                      ;address of CALL breakpoint in native order
-TSTG_SIZE       =     .-TSTG          		;SIZE OF STRING
+B1:      	.byte	"6800 monitor V1.1 Dossy", 0
+						;DESCRIPTION, ZERO
+		.byte	0
+		.byte	0                       	;page of CALL breakpoint
+		.word	0			;address of CALL breakpoint in native order
+TSTG_END:
+		.equ	TSTG_SIZE, TSTG_END-TSTG;SIZE OF STRING
 ;
 ;======================================================================
 ;  HARDWARE PLATFORM INDEPENDENT EQUATES AND CODE
 ;
 ;  Communications function codes.
-FN_GET_STAT     =     0xFF    			;reply with device info
-FN_READ_MEM     =     0xFE    			;reply with data
-FN_WRITE_MEM    =     0xFD    			;reply with status (+/-)
-FN_RD_REG       =     0xFC    			;reply with registers
-FN_WR_REG       =     0xFB    			;reply with status
-FN_RUN_TARG     =     0xFA    			;reply (delayed) with registers
-FN_SET_BYTE     =     0xF9    			;reply with data (truncate if error)
-FN_IN           =     0xF8    			;input from port
-FN_OUT          =     0xF7    			;output to port
+		.equ	FN_GET_STAT,	0xFF	;reply with device info
+		.equ	FN_READ_MEM,	0xFE	;reply with data
+		.equ	FN_WRITE_MEM,	0xFD	;reply with status (+/-)
+		.equ	FN_RD_REG,	0xFC	;reply with registers
+		.equ	FN_WR_REG,	0xFB	;reply with status
+		.equ	FN_RUN_TARG,	0xFA	;reply (delayed) with registers
+		.equ	FN_SET_BYTE,	0xF9	;reply with data (truncate if error)
+		.equ	FN_IN,		0xF8	;input from port
+		.equ	FN_OUT,		0xF7	;output to port
 ;
-FN_MIN          =     0xF0    			;MINIMUM RECOGNIZED FUNCTION CODE
-FN_ERROR        =     0xF0    			;error reply to unknown op-code
+		.equ	FN_MIN,		0xF0	;MINIMUM RECOGNIZED FUNCTION CODE
+		.equ	FN_ERROR,	0xF0	;error reply to unknown op-code
 ;
 ;===========================================================================
 ;  Common handler for default interrupt handlers
@@ -224,9 +253,6 @@ INT_ENTRY:
 		STAA	REG_X+1         	;MSB
 		PULA
 		STAA	REG_X           	;LSB
-		CLRA
-		STAA	REG_Y+1         	;MSB
-		STAA	REG_Y           	;LSB
 ;
 ;  If this is a breakpoint (state = 1), then back up PC to point at SWI
 ;  (If SWI2, SWI3, or another instruction is used for breakpoint,
@@ -786,12 +812,12 @@ NMI_ENT:	LDAA	REG_STATE
 EXIT_NMI:	RTI
 ;
 ;  INTERRUPT VECTORS
-		.org	HARD_VECT
+		.section HARD_VECS, "acrx"
 ;
 ;  The remaining interrupts are permanently trapped to the monitor
-		.dw	IRQ_ENTRY		;fff8 IRQ
-		.dw	SWI_ENTRY               ;fff6 SWI/breakpoint
-		.dw	NMI_ENT		        ;fffc NMI
-		.dw	RESET                   ;fffe reset
+		.word	IRQ_ENTRY		;fff8 IRQ
+		.word	SWI_ENTRY               ;fff6 SWI/breakpoint
+		.word	NMI_ENT		        ;fffc NMI
+		.word	RESET                   ;fffe reset
 ;
-		.end	RESET
+
